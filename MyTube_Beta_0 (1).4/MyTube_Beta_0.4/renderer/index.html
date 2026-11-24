@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https: data:; media-src https:; style-src 'self'">
+<title>MyTube Beta 0.4</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header>
+  <h1 id="logo">MyTube <small>Beta 0.4</small></h1>
+  <nav id="topnav"></nav>
+  <div id="tools"><form id="sf"><input id="q" placeholder="Search…" autocomplete="off">
+    <select id="stype"><option value="videos">Videos</option><option value="channels">Channels</option></select><button>Search</button></form>
+    <span id="status" class="muted"></span><button id="refresh">Refresh</button></div>
+  <div id="winctl"><button data-w="min" title="Minimize">–</button><button data-w="max" title="Maximize / restore">▢</button><button data-w="close" title="Close">✕</button></div>
+</header>
+<div id="shell">
+<aside id="side"><div id="sidetop"></div><div id="sidetools"></div><div id="sidenav"></div><div id="sidesubs" hidden></div><button id="sidetoggle" title="Collapse / expand sidebar">⇤</button></aside>
+<main>
+  <div id="banner" class="banner" hidden></div>
+  <section id="view-home">
+    <div id="chipbar" class="chips"></div>
+    <div id="subhead" class="row" hidden></div>
+    <div id="grid" class="grid"></div>
+    <p id="empty" class="muted"></p>
+    <div class="row center"><button id="more">Show more</button></div>
+  </section>
+
+  <section id="view-subs" hidden>
+    <div class="row"><h3 id="subtitle" class="nomargin"></h3>
+      <select id="subsort"><option value="latest">Latest</option><option value="popular">Most viewed</option><option value="oldest">Oldest</option></select>
+      <button id="submanagebtn">Manage</button><button id="subtoggle"></button><button id="subrefresh">Refresh now</button></div>
+    <div id="substrip" class="strip"></div>
+    <div id="submanage" class="panel" hidden>
+      <div class="row"><input id="subsearch" placeholder="Filter channels…"><input id="subadd" size="34" placeholder="Add: channel ID / URL (UC…) or a name to search">
+        <button id="subaddbtn">Add</button><button id="subimport">Import files…</button></div>
+      <div id="sublist" class="sublist"></div>
+    </div>
+    <div id="subgrid" class="grid"></div>
+  </section>
+
+  <section id="view-playlists" hidden>
+    <div id="plmain">
+      <div class="row"><input id="plnew" placeholder="New playlist name"><button id="pladd">Create</button></div>
+      <div id="pllist" class="chips"></div>
+    </div>
+    <div id="pldetail" hidden></div>
+  </section>
+
+  <section id="view-algo" hidden>
+    <p id="algonote" class="muted"></p>
+    <div id="presets" class="row"></div>
+    <div id="algo-fields"></div>
+    <div class="row" id="advonly"><button id="algoreset">Reset algorithm settings to defaults</button></div>
+    <h3>What it has learned (fades over time)</h3>
+    <div class="cols"><div><h4>Categories</h4><ul id="l-cats"></ul></div><div><h4>Tags</h4><ul id="l-tags"></ul></div><div><h4>Channels</h4><ul id="l-chans"></ul></div></div>
+    <h3>Pinned interests</h3>
+    <p class="muted">Pins set a minimum interest level, even if you have never watched the topic.</p>
+    <div class="row"><select id="pintype"><option value="category">Category</option><option value="tag">Tag / keyword</option></select>
+      <input id="pinname" list="cats" placeholder="e.g. Gaming or linux"><label>Strength <input id="pinstr" type="range" min="10" max="100" value="70"></label><button id="pinadd">Pin</button></div>
+    <div id="pins" class="chips"></div>
+    <h3>Muted</h3>
+    <div class="row"><input id="mutename" placeholder="Word in title to hide"><button id="muteadd">Mute word</button></div>
+    <div id="mutedw" class="chips"></div><div id="mutedc" class="chips"></div>
+    <h3>Ignored</h3>
+    <p class="muted">Things you removed from what the algorithm uses (✕ in the lists above). Click ✕ here to bring them back.</p>
+    <div id="ignored" class="chips"></div>
+    <h3>Disliked videos</h3>
+    <p class="muted">Disliked videos are hidden and push similar videos down. Click ✕ to undo.</p>
+    <div id="dislist" class="chips"></div>
+  </section>
+
+  <section id="view-settings" hidden>
+    <div id="set-fields"></div>
+    <h3>Import / export</h3>
+    <p class="muted">Reads Google Takeout files (subscriptions.csv, playlist CSVs, Liked videos, watch-history.json) and NewPipe/Piped subscription JSON. Export writes the same file types.</p>
+    <div class="row"><button id="dimport">Import files…</button><button id="dexport">Export in YouTube formats…</button></div>
+    <pre id="dmsg" class="muted" hidden></pre>
+    <h3>Data</h3>
+    <p class="muted" id="datadir"></p>
+    <div class="row"><button id="opendata">Open data folder</button><button id="export">Export backup (MyTube)</button><button id="import">Import backup (MyTube)</button>
+      <button id="editcats">Edit categories</button><button id="resetlearned">Delete watch history</button></div>
+    <div class="row"><button id="ytest">Test yt-dlp</button><span id="ytres" class="muted"></span></div>
+  </section>
+
+  <section id="view-instances" hidden>
+    <div class="row"><button id="check">Check all now</button><button id="fetchlist">Fetch new instance list</button><span id="listmsg" class="muted"></span></div>
+    <table><thead><tr><th></th><th>Instance</th><th>Latency</th><th>Failures</th><th>Last checked</th></tr></thead><tbody id="inst"></tbody></table>
+  </section>
+
+  <section id="view-logs" hidden>
+    <p class="muted">Technical app log for debugging (network calls, yt-dlp, errors). It never contains your watch history, titles or search terms, and video/channel IDs are shortened unless you turn on full IDs in Settings → Debug.</p>
+    <div class="row">
+      <label>Level <select id="loglevel"><option>debug</option><option selected>info</option><option>warn</option><option>error</option></select></label>
+      <label>Source <select id="logsrc"><option value="">all</option><option>net</option><option>yt-dlp</option><option>piped</option><option>ui</option><option>main</option><option>perf</option><option>meta</option></select></label>
+      <button id="logrefresh">Refresh</button><button id="logcopy">Copy diagnostics</button><button id="logsave">Save to file…</button>
+      <button id="logopen">Show file</button><button id="logclear">Clear</button><button id="selftest">Run self-test</button><span id="logmsg" class="muted"></span>
+    </div>
+    <table id="testtable" hidden><thead><tr><th>Test</th><th>Result</th><th>Time</th><th>Detail</th></tr></thead><tbody id="testrows"></tbody></table>
+    <pre id="logbox" class="logbox"></pre>
+  </section>
+</main>
+</div>
+
+<datalist id="cats"><option value="Gaming"><option value="Music"><option value="Science &amp; Technology"><option value="Education"><option value="Howto &amp; Style"><option value="Film &amp; Animation"><option value="Entertainment"><option value="Comedy"><option value="Sports"><option value="News &amp; Politics"><option value="Autos &amp; Vehicles"><option value="Travel &amp; Events"><option value="Pets &amp; Animals"><option value="People &amp; Blogs"></datalist>
+
+<dialog id="player">
+  <video id="video" controls></video><audio id="audio"></audio>
+  <h2 id="ptitle"></h2>
+  <div class="row"><b id="pch" class="link"></b><span id="psubwrap"></span><span id="pmeta" class="muted"></span></div>
+  <div class="row"><button id="plike" title="Like: strong signal">👍 Like</button><button id="pdis" title="Dislike: hides similar videos">👎 Dislike</button><button id="padd">＋ Playlist</button><button id="pprev" hidden>⏮ Previous</button><button id="pnext" hidden>Next ⏭</button></div>
+  <pre id="phelp" hidden></pre>
+  <div class="row"><label>Quality <select id="quality"></select></label><button id="ext">Open on YouTube</button><button id="close">Close</button></div>
+</dialog>
+
+<dialog id="plpick">
+  <h3>Add to playlist</h3>
+  <div id="plpickList" class="chips"></div>
+  <div class="row"><input id="plpickname" placeholder="New playlist…"><button id="plpickcreate">Create and add</button><button id="plpickclose">Done</button></div>
+</dialog>
+
+<dialog id="onboard">
+  <h2>What are you interested in?</h2>
+  <p class="muted">Pick categories to get videos from. They also give the recommender a head start, and fade as you watch things. You can change this any time.</p>
+  <div class="chips" id="chips"></div>
+  <label>Your own topics (comma separated)<input id="custom" placeholder="linux, minecraft, retro"></label>
+  <div class="row"><button id="obdone">Continue</button><button id="obskip">Skip</button></div>
+</dialog>
+<script src="renderer.js"></script>
+</body></html>
